@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import OpenAI from "openai";
 import './App.css';
 import { ChatCompletionMessageParam } from 'openai/src/resources/index.js';
-import { ImageGenerateParams } from 'openai/resources/images.mjs';
 
 const BASE_URL = import.meta.env.VITE_VENICE_BASE_URL;
 const API_KEY = import.meta.env.VITE_VENICE_API_KEY;
@@ -66,10 +65,13 @@ function App() {
     dangerouslyAllowBrowser: true, // needed for vite, but not best practice
   });
 
-  const fetchModels = async () => {
-    const options = {method: 'GET', headers: {Authorization: `Bearer ${API_KEY}`}};
+  const fetchModels = async (modelType: string = 'text') => {
+    const options = {
+      method: 'GET', 
+      headers: {Authorization: `Bearer ${API_KEY}`}
+      };
     try {
-      const response = await fetch(BASE_URL + '/models', options);
+      const response = await fetch(BASE_URL + `/models?type=${modelType}`, options);
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -186,30 +188,45 @@ function App() {
     setError(null);
 
     try {
-        const imageParams = {
-            prompt: inputText,
-            n: 1, // Generate one image
-            size: '512x512', // Adjust size as needed
-            style_preset: selectedImageStyle,
-        };
-        const response = await veniceClient.images.generate(imageParams as ImageGenerateParams);
+      const options = {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: selectedModel,
+          prompt: inputText,
+          // width: 1024,
+          // height: 1024,
+          // steps: 30,
+          hide_watermark: true,
+          // return_binary: false,
+          // seed: 123,
+          // cfg_scale: 123,
+          style_preset: selectedImageStyle,
+          // negative_prompt: "",
+          // safe_mode: false
+        })
+      };
 
-        if (response.data && response.data.length > 0) {
-            setGeneratedImageUrl(response.data[0]?.url || null);
-            setResponseText(`Image generation complete: ${generatedImageUrl}`);
-            console.log('Generated Image URL:', generatedImageUrl);
-        } else {
-            setError('No image was generated.');
-            setGeneratedImageUrl(null);
-        }
-    } catch (apiError: any) {
-        console.error('OpenAI API Error:', apiError);
-        setError(`Image generation failed: ${apiError.message || 'Unknown error'}`);
+      const response = await (await fetch(BASE_URL + '/image/generate', options)).json();
+
+      if (response.images && response.images.length > 0) {
+        // Construct the Data URL
+        const imageDataString = `data:image/png;base64,${response.images[0]}`;
+        setGeneratedImageUrl(imageDataString || null);
+        setResponseText(`Image generated successfully!`);
+      } else {
+        setError('No image was generated.');
         setGeneratedImageUrl(null);
+      }
+    } catch (apiError: any) {
+      console.error('OpenAI API Error:', apiError);
+      setError(`Image generation failed: ${apiError.message || 'Unknown error'}`);
+      setGeneratedImageUrl(null);
     }
   };
 
   const handleGenerationTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    fetchModels(event.target.checked ? 'image' : 'text'); // Fetch models again when the output type changes
     setIsImageGeneration(event.target.checked);
     //clear text when switching between text and image generation
     setInputText('');
@@ -252,10 +269,6 @@ function App() {
         const fullResponse = await fetchFullResponse(veniceClient, inputText, selectedModel, 150);
         setResponseText(fullResponse || 'No response');
       }
-
-
-
-      
 
       // 3. Embeddings API (for creating vector embeddings):
       // const embeddings = await veniceClient.embeddings.create({
@@ -344,6 +357,11 @@ function App() {
             {responseText}
           </div>
         </div>        
+      )}
+      {isImageGeneration && generatedImageUrl && (
+        <div className="image-response">
+          <img src={generatedImageUrl} alt="Generated" style={{ maxWidth: '100%', height: 'auto' }} />
+        </div>
       )}
       
     </>
