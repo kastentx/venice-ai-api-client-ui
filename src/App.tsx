@@ -52,6 +52,9 @@ function App() {
   // text input field
   const [inputText, setInputText] = useState('');
   const [responseText, setResponseText] = useState('');
+  // image style select
+  const [imageStyles, setImageStyles] = useState<string[]>([]); // New state for image styles
+  const [selectedImageStyle, setSelectedImageStyle] = useState<string>(''); // New state for selected image style
 
   const veniceClient = new OpenAI({
     baseURL: BASE_URL,
@@ -82,8 +85,34 @@ function App() {
     }
   };
 
+
+  const fetchImageStyles = async () => {
+    const options = {method: 'GET', headers: {Authorization: `Bearer ${API_KEY}`}};
+    try {
+      const response = await fetch(BASE_URL + '/image/styles', options);
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data.data)) {
+          setImageStyles(data.data as string[]); // Store directly as string[]
+      } else {
+          throw new Error('Invalid image styles format from API');
+      }
+
+      setError(null);
+    } catch (e: any) {
+        setError(e.message || 'An error occurred');
+        setImageStyles([]);
+        console.error("Fetch image styles error:", e);
+    }
+  };
+
   useEffect(() => {
     fetchModels(); // Fetch models when the component mounts
+    fetchImageStyles(); // Fetch image styles when the component mounts
   }, []);
 
   const handleModelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -93,6 +122,10 @@ function App() {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputText(event.target.value);
   };
+
+  const handleImageStyleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedImageStyle(event.target.value);
+  };  
 
   async function fetchFullResponse(openai: OpenAI, userInput: string, model: string, maxTokens: number) {
     let fullResponse = ""; // To store the complete response
@@ -106,7 +139,7 @@ function App() {
         const response = await openai.chat.completions.create({
           model,
           messages,
-          max_tokens: maxTokens,
+          max_completion_tokens: maxTokens,
         });
         const responseObj = JSON.parse(response as unknown as string) as CompletionResponse;
         // Append the content of this chunk to the full response
@@ -191,6 +224,16 @@ function App() {
 
   return (
     <>
+      {/* Dropdown for image styles */}
+      <select value={selectedImageStyle} onChange={handleImageStyleChange}>
+          <option value="">Select Image Style</option>
+          {imageStyles.map((style) => (
+              <option key={style} value={style}>
+                  {style}
+              </option>
+          ))}
+      </select>
+      <br/>
       <select value={selectedModel} onChange={handleModelChange}>
           <option value="">Select a Model</option>
           {models.map((model) => (
