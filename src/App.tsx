@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import OpenAI from "openai";
 import './App.css';
 import { ChatCompletionMessageParam } from 'openai/src/resources/index.js';
+import { ImageGenerateParams } from 'openai/resources/images.mjs';
 
 const BASE_URL = import.meta.env.VITE_VENICE_BASE_URL;
 const API_KEY = import.meta.env.VITE_VENICE_API_KEY;
@@ -56,6 +57,9 @@ function App() {
   const [imageStyles, setImageStyles] = useState<string[]>([]); // New state for image styles
   const [selectedImageStyle, setSelectedImageStyle] = useState<string>(''); // New state for selected image style
 
+  const [isImageGeneration, setIsImageGeneration] = useState(false); // Toggle switch state
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null); // Store generated image URL
+
   const veniceClient = new OpenAI({
     baseURL: BASE_URL,
     apiKey: API_KEY,
@@ -84,7 +88,6 @@ function App() {
       console.error("Fetch error:", e);
     }
   };
-
 
   const fetchImageStyles = async () => {
     const options = {method: 'GET', headers: {Authorization: `Bearer ${API_KEY}`}};
@@ -175,6 +178,44 @@ function App() {
     return fullResponse;
   }
 
+  const fetchImageResponse = async () => {
+    if (!inputText) {
+        setError('Please enter an image description.');
+        return;
+    }
+    setError(null);
+
+    try {
+        const imageParams = {
+            prompt: inputText,
+            n: 1, // Generate one image
+            size: '512x512', // Adjust size as needed
+            style_preset: selectedImageStyle,
+        };
+        const response = await veniceClient.images.generate(imageParams as ImageGenerateParams);
+
+        if (response.data && response.data.length > 0) {
+            setGeneratedImageUrl(response.data[0]?.url || null);
+            setResponseText(`Image generation complete: ${generatedImageUrl}`);
+            console.log('Generated Image URL:', generatedImageUrl);
+        } else {
+            setError('No image was generated.');
+            setGeneratedImageUrl(null);
+        }
+    } catch (apiError: any) {
+        console.error('OpenAI API Error:', apiError);
+        setError(`Image generation failed: ${apiError.message || 'Unknown error'}`);
+        setGeneratedImageUrl(null);
+    }
+  };
+
+  const handleGenerationTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsImageGeneration(event.target.checked);
+    //clear text when switching between text and image generation
+    setInputText('');
+    setResponseText('');
+  };
+
   const handleVeniceAIRequest = async () => {
     if (!selectedModel) {
       setError('Please select a model.');
@@ -204,8 +245,17 @@ function App() {
       // 2. Chat Completions API (for conversational models like GPT-3.5 Turbo, GPT-4):
 
       // using the completions response interface as the response type
-      const fullResponse = await fetchFullResponse(veniceClient, inputText, selectedModel, 150);
-      setResponseText(fullResponse || 'No response');
+      if (isImageGeneration) {
+        await fetchImageResponse(); // Call the function to generate images
+
+      } else {
+        const fullResponse = await fetchFullResponse(veniceClient, inputText, selectedModel, 150);
+        setResponseText(fullResponse || 'No response');
+      }
+
+
+
+      
 
       // 3. Embeddings API (for creating vector embeddings):
       // const embeddings = await veniceClient.embeddings.create({
@@ -224,7 +274,15 @@ function App() {
 
   return (
     <>
-      {/* Dropdown for image styles */}
+      <label>
+          Generate Image:
+          <input
+              type="checkbox"
+              checked={isImageGeneration}
+              onChange={handleGenerationTypeChange}
+          />
+      </label>
+      <br/>
       <select value={selectedImageStyle} onChange={handleImageStyleChange}>
           <option value="">Select Image Style</option>
           {imageStyles.map((style) => (
