@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import OpenAI from "openai";
 import './App.css';
+import { ChatCompletionMessageParam } from 'openai/src/resources/index.js';
 
 const BASE_URL = import.meta.env.VITE_VENICE_BASE_URL;
 const API_KEY = import.meta.env.VITE_VENICE_API_KEY;
@@ -93,6 +94,54 @@ function App() {
     setInputText(event.target.value);
   };
 
+  async function fetchFullResponse(openai: OpenAI, userInput: string, model: string, maxTokens: number) {
+    let fullResponse = ""; // To store the complete response
+    let stopReason = "length"; // Initial stop reason
+    const maxRetries = 10; // Limit retries to avoid infinite loops
+    let messages: ChatCompletionMessageParam[] = [{ role: "user", content: userInput }];
+    let retries = 0;
+  
+    while (stopReason === "length" && retries < maxRetries) {
+      try {
+        const response = await openai.chat.completions.create({
+          model,
+          messages,
+          max_tokens: maxTokens,
+        });
+        const responseObj = JSON.parse(response as unknown as string) as CompletionResponse;
+        // Append the content of this chunk to the full response
+        const chunk = responseObj.choices[0].message?.content || "";
+        messages.push({ role: "assistant", content: chunk });
+        fullResponse += chunk;
+        console.log("responseObj", responseObj);
+        console.log("chunk", chunk);
+  
+        // Check the stop reason
+        stopReason = responseObj.choices[0].finish_reason;
+  
+        // If the stop reason is "length", add a continuation message
+        if (stopReason === "length") {
+          messages.push({ 
+            role: "user",
+            content: "Continue from exactly where you stopped. Provide a brief summary of the remaining information. Do not repeat any previous content." 
+          });
+        }
+  
+      } catch (error) {
+        console.error("Error fetching response:", error);
+        break; // Exit loop on error
+      }
+  
+      retries++;
+    }
+  
+    if (retries >= maxRetries) {
+      console.warn("Reached maximum retries for fetching full response.");
+    }
+  
+    return fullResponse;
+  }
+
   const handleVeniceAIRequest = async () => {
     if (!selectedModel) {
       setError('Please select a model.');
@@ -105,7 +154,8 @@ function App() {
     }
 
     setError(null);
-
+    
+    setResponseText('Loading...');
     try {
       // Example API requests using the selected model
       // You can uncomment the one you need based on your use case
@@ -121,16 +171,8 @@ function App() {
       // 2. Chat Completions API (for conversational models like GPT-3.5 Turbo, GPT-4):
 
       // using the completions response interface as the response type
-      const chatCompletion = await veniceClient.chat.completions.create({
-        model: selectedModel, // Use the selected model ID (e.g., "gpt-3.5-turbo")
-        messages: [{ role: "user", content: inputText }],
-        max_tokens: 150,
-      });
-      const chatCompletionObj = JSON.parse(chatCompletion as unknown as string) as CompletionResponse;
-      console.log("Chat Completion Response:", chatCompletionObj);
-      setResponseText(chatCompletionObj.choices[0].message.content || 'No response');
-      // todo: handle responses that terminate due to 'length'
-      
+      const fullResponse = await fetchFullResponse(veniceClient, inputText, selectedModel, 150);
+      setResponseText(fullResponse || 'No response');
 
       // 3. Embeddings API (for creating vector embeddings):
       // const embeddings = await veniceClient.embeddings.create({
@@ -193,9 +235,9 @@ function App() {
             border: '1px solid #003300',
             maxWidth: '600px',
             maxHeight: '400px',
-            wordWrap: 'break-word', /* ADDED THIS LINE */
-            whiteSpace: 'pre-wrap', /* ADDED THIS LINE */
-
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            overflowY: 'auto',
             }}
           >
             {responseText}
