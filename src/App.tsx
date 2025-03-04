@@ -156,6 +156,7 @@ function App() {
   return (
     <Box
       minHeight="100vh"
+      minWidth="600px"
       bg="gray.900"
       color="white"
       display="flex"
