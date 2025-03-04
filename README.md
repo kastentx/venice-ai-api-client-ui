@@ -2,7 +2,9 @@
 
 **Todos:**
 - split code into multiple files
+- look into cleaning up app state
 - clean up UI switch between image/text generation mode
+- check image style 'none' error
 - convert chat window into more of a back and forth, text message style UI
 - add special formatting for 'think' modes in deepseek models, other reasoning output
 - determine if there are any code output options available

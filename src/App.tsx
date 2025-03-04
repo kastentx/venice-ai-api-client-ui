@@ -2,52 +2,15 @@ import { useState, useEffect } from 'react';
 import OpenAI from "openai";
 import './App.css';
 import { ChatCompletionMessageParam } from 'openai/src/resources/index.js';
+import { IModel, ICompletionResponse } from './types';
 
 const BASE_URL = import.meta.env.VITE_VENICE_BASE_URL;
 const API_KEY = import.meta.env.VITE_VENICE_API_KEY;
 
-interface Model {
-  id: string;
-  type: string;
-  object: string;
-  created: number;
-  owned_by: string;
-  model_spec: {
-    availableContextTokens: number;
-    traits: string[];
-    modelSource: string;
-  };
-}
-
-interface CompletionResponse {
-  id: string;
-  object: string;
-  created: number;
-  model: string;
-  choices: {
-    index: number;
-    message: {
-      role: string;
-      content: string;
-      reasoning_content: null | string;
-      tool_calls: any[];
-    };
-    logprobs: null | any;
-    finish_reason: string;
-    stop_reason: null | string;
-  }[];
-  usage: {
-    prompt_tokens: number;
-    total_tokens: number;
-    completion_tokens: number;
-    prompt_tokens_details: null | any;
-  };
-}
-
 function App() {
   const [error, setError] = useState<string | null>(null);
   // model select
-  const [models, setModels] = useState<Model[]>([]);
+  const [models, setModels] = useState<IModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>('');
   // text input field
   const [inputText, setInputText] = useState('');
@@ -79,7 +42,7 @@ function App() {
 
       const data = await response.json();
       if (data.data && Array.isArray(data.data)) {
-        setModels(data.data as Model[]);
+        setModels(data.data as IModel[]);
       } else {
         throw new Error('Invalid data format from API');
       }
@@ -146,7 +109,7 @@ function App() {
           messages,
           max_completion_tokens: maxTokens,
         });
-        const responseObj = JSON.parse(response as unknown as string) as CompletionResponse;
+        const responseObj = JSON.parse(response as unknown as string) as ICompletionResponse;
         // Append the content of this chunk to the full response
         const chunk = responseObj.choices[0].message?.content || "";
         messages.push({ role: "assistant", content: chunk });
