@@ -3,13 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 import './App.css';
 import { useModels } from './hooks/useModels';
 import { useImageStyles } from './hooks/useImageStyles';
-import ModelSelector from './components/ModelSelector';
-import ImageStyleSelector from './components/ImageStyleSelector';
 import TextInput from './components/TextInput';
 import ResponseDisplay from './components/ResponseDisplay';
-import GenerationTypeToggle from './components/GenerationTypeToggle';
+import Header from './components/Header';
 import { fetchFullResponse, generateImage } from './services/api';
-import { Box, Flex } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 
 // Define the Message interface
 interface Message {
@@ -61,6 +59,7 @@ function App() {
   };
 
   const handleVeniceAIRequest = async () => {
+    // Existing code...
     if (!selectedModel) {
       setError('Please select a model.');
       return;
@@ -86,6 +85,7 @@ function App() {
     setInputText(''); // Clear input after sending
     
     try {
+      // Existing code for image generation and text generation...
       if (isImageGeneration) {
         // Add placeholder AI message
         const placeholderMessage: Message = {
@@ -158,31 +158,21 @@ function App() {
       minHeight="100vh"
       bg="gray.900"
       color="white"
-      p={4}
       display="flex"
       flexDirection="column"
       alignItems="center"
+      pt="70px" // Add padding to account for the fixed header
     >
-      <Flex width="100%" maxWidth="600px" mb={4} justifyContent="space-between">
-        <GenerationTypeToggle 
-          isImageGeneration={isImageGeneration} 
-          onChange={handleGenerationTypeChange} 
-        />
-        
-        <ModelSelector 
-          models={models} 
-          selectedModel={selectedModel} 
-          onModelChange={handleModelChange} 
-        />
-        
-        {isImageGeneration && (
-          <ImageStyleSelector 
-            imageStyles={imageStyles} 
-            selectedStyle={selectedImageStyle} 
-            onStyleChange={handleImageStyleChange} 
-          />
-        )}
-      </Flex>
+      <Header
+        isImageGeneration={isImageGeneration}
+        models={models}
+        selectedModel={selectedModel}
+        imageStyles={imageStyles}
+        selectedImageStyle={selectedImageStyle}
+        onGenerationTypeChange={handleGenerationTypeChange}
+        onModelChange={handleModelChange}
+        onStyleChange={handleImageStyleChange}
+      />
       
       <ResponseDisplay 
         messages={messages}
