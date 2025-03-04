@@ -1,7 +1,7 @@
 # Venice AI - API Client UI
 
 **Todos:**
-- [ ] split code into multiple files
+- [x] split code into multiple files
 - [ ] look into cleaning up app state
 - [ ] clean up UI switch between image/text generation mode
 - [ ] check image style 'none' error
