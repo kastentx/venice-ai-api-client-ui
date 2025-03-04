@@ -12,6 +12,7 @@
 - [ ] add extended options for image gen, etc. to match API spec
 - [ ] consider alternate UI for code generation with subset of models
 - [ ] expose model features like web_search, etc.
+- [ ] fully convert to chakra UI
 
 **Web3 todos**
 - [ ] check options for signing in with wallet and using browser storage to create accounts, allow deletion (like venice)

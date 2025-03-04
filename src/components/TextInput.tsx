@@ -1,4 +1,10 @@
 import React from 'react';
+import { 
+  Input, 
+  Button, 
+  Box,
+  Flex
+} from '@chakra-ui/react';
 
 interface TextInputProps {
   inputText: string;
@@ -20,16 +26,25 @@ const TextInput: React.FC<TextInputProps> = ({
   };
 
   return (
-    <div className="text-input">
-      <input
-        type="text"
-        value={inputText}
-        onChange={onInputChange}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-      />
-      <button onClick={onSubmit}>Send</button>
-    </div>
+    <Box mb={4} width="100%" maxWidth="600px">
+      <Flex>
+        <Input
+          value={inputText}
+          onChange={onInputChange}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          borderRadius="md"
+          mr={2}
+        />
+        <Button 
+          colorScheme="blue"
+          onClick={onSubmit}
+          disabled={!inputText.trim()}
+        >
+          Send
+        </Button>
+      </Flex>
+    </Box>
   );
 };
 

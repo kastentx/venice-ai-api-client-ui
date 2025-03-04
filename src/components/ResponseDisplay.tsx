@@ -1,4 +1,10 @@
 import React from 'react';
+import {
+  Box,
+  Text,
+  Image,
+  Flex,
+} from '@chakra-ui/react';
 
 interface ResponseDisplayProps {
   responseText?: string;
@@ -14,42 +20,54 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
   error
 }) => {
   return (
-    <div className="response-display">
+    <Box width="100%" maxWidth="600px" mt={4}>
       {error && (
-        <div className="error">
-          Error: {error}
-        </div>
+        <Box 
+          p={4} 
+          bg="red.100" 
+          color="red.800" 
+          borderRadius="md" 
+          mb={4}
+          borderLeft="4px solid"
+          borderColor="red.500"
+        >
+          <Text fontWeight="bold" fontSize="md">Error:</Text>
+          <Text>{error}</Text>
+        </Box>
       )}
 
       {responseText && (
-        <div className="response">
-          <div 
-            style={{ 
-              backgroundColor: 'black',
-              color: '#00ff00', // Terminal green
-              fontFamily: 'monospace',
-              padding: '20px',
-              borderRadius: '4px',
-              margin: '20px 0',
-              border: '1px solid #003300',
-              maxWidth: '600px',
-              maxHeight: '400px',
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-              overflowY: 'auto',
-            }}
+        <Box mb={4}>
+          <Box 
+            bg="gray.900"
+            color="green.400"
+            fontFamily="mono"
+            p={4}
+            borderRadius="md"
+            border="1px"
+            borderColor="green.800"
+            maxHeight="400px"
+            wordBreak="break-word"
+            whiteSpace="pre-wrap"
+            overflowY="auto"
           >
             {responseText}
-          </div>
-        </div>        
+          </Box>
+        </Box>        
       )}
       
       {isImageMode && imageUrl && (
-        <div className="image-response">
-          <img src={imageUrl} alt="Generated" style={{ maxWidth: '100%', height: 'auto' }} />
-        </div>
+        <Flex justifyContent="center" mt={4}>
+          <Image 
+            src={imageUrl} 
+            alt="Generated" 
+            maxWidth="100%" 
+            borderRadius="md"
+            boxShadow="lg"
+          />
+        </Flex>
       )}
-    </div>
+    </Box>
   );
 };
 
