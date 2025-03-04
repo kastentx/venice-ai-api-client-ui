@@ -4,7 +4,7 @@ import './App.css';
 import { useModels } from './hooks/useModels';
 import { useImageStyles } from './hooks/useImageStyles';
 import TextInput from './components/TextInput';
-import ResponseDisplay from './components/ResponseDisplay';
+import ChatDisplay from './components/ChatDisplay';
 import Header from './components/Header';
 import { fetchFullResponse, generateImage } from './services/api';
 import { Box } from '@chakra-ui/react';
@@ -174,7 +174,7 @@ function App() {
         onStyleChange={handleImageStyleChange}
       />
       
-      <ResponseDisplay 
+      <ChatDisplay 
         messages={messages}
         error={error}
       />

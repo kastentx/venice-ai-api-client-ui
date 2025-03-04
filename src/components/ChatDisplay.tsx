@@ -14,12 +14,12 @@ interface Message {
   imageUrl?: string | null;
 }
 
-interface ResponseDisplayProps {
+interface ChatDisplayProps {
   messages: Message[];
   error?: string | null;
 }
 
-const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
+const ChatDisplay: React.FC<ChatDisplayProps> = ({
   messages,
   error
 }) => {
@@ -71,4 +71,4 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
   );
 };
 
-export default ResponseDisplay;
+export default ChatDisplay;
