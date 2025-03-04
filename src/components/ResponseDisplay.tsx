@@ -1,29 +1,47 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   Box,
   Text,
-  Image,
   Flex,
 } from '@chakra-ui/react';
+import ChatMessage from './ChatMessage';
+
+interface Message {
+  id: string;
+  content: string;
+  isUser: boolean;
+  timestamp: Date;
+  imageUrl?: string | null;
+}
 
 interface ResponseDisplayProps {
-  responseText?: string;
-  imageUrl?: string | null;
-  isImageMode: boolean;
+  messages: Message[];
   error?: string | null;
 }
 
 const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
-  responseText,
-  imageUrl,
-  isImageMode,
+  messages,
   error
 }) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   return (
-    <Box width="100%" maxWidth="600px" mt={4}>
+    <Box 
+      width="100%" 
+      maxWidth="600px"
+      height="calc(100vh - 180px)" // Adjust based on your input height
+      mb={2}
+      overflowY="auto"
+      p={2}
+    >
       {error && (
         <Box 
-          p={4} 
+          p={3} 
           bg="red.100" 
           color="red.800" 
           borderRadius="md" 
@@ -31,42 +49,24 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
           borderLeft="4px solid"
           borderColor="red.500"
         >
-          <Text fontWeight="bold" fontSize="md">Error:</Text>
-          <Text>{error}</Text>
+          <Text fontWeight="bold" fontSize="sm">Error:</Text>
+          <Text fontSize="sm">{error}</Text>
         </Box>
       )}
 
-      {responseText && (
-        <Box mb={4}>
-          <Box 
-            bg="gray.900"
-            color="green.400"
-            fontFamily="mono"
-            p={4}
-            borderRadius="md"
-            border="1px"
-            borderColor="green.800"
-            maxHeight="400px"
-            wordBreak="break-word"
-            whiteSpace="pre-wrap"
-            overflowY="auto"
-          >
-            {responseText}
+      <Flex direction="column">
+        {messages.map((message) => (
+          <Box key={message.id} mb={4}>
+            <ChatMessage
+              content={message.content}
+              isUser={message.isUser}
+              timestamp={message.timestamp}
+              imageUrl={message.imageUrl}
+            />
           </Box>
-        </Box>        
-      )}
-      
-      {isImageMode && imageUrl && (
-        <Flex justifyContent="center" mt={4}>
-          <Image 
-            src={imageUrl} 
-            alt="Generated" 
-            maxWidth="100%" 
-            borderRadius="md"
-            boxShadow="lg"
-          />
-        </Flex>
-      )}
+        ))}
+      </Flex>
+      <div ref={messagesEndRef} />
     </Box>
   );
 };

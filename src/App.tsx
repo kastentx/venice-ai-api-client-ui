@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import './App.css';
 import { useModels } from './hooks/useModels';
 import { useImageStyles } from './hooks/useImageStyles';
@@ -8,13 +9,23 @@ import TextInput from './components/TextInput';
 import ResponseDisplay from './components/ResponseDisplay';
 import GenerationTypeToggle from './components/GenerationTypeToggle';
 import { fetchFullResponse, generateImage } from './services/api';
+import { Box, Flex } from '@chakra-ui/react';
+
+// Define the Message interface
+interface Message {
+  id: string;
+  content: string;
+  isUser: boolean;
+  timestamp: Date;
+  imageUrl?: string | null;
+}
 
 function App() {
   const [error, setError] = useState<string | null>(null);
   const [inputText, setInputText] = useState('');
-  const [responseText, setResponseText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [isImageGeneration, setIsImageGeneration] = useState(false);
-  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   
   // Use our custom hooks
   const { 
@@ -47,8 +58,6 @@ function App() {
     loadModels(newIsImageMode ? 'image' : 'text');
     setIsImageGeneration(newIsImageMode);
     setInputText('');
-    setResponseText('');
-    setGeneratedImageUrl(null);
   };
 
   const handleVeniceAIRequest = async () => {
@@ -57,65 +66,139 @@ function App() {
       return;
     }
 
-    if (!inputText) {
+    if (!inputText.trim()) {
       setError('Please enter some text.');
       return;
     }
 
     setError(null);
-    setResponseText('Loading...');
+    setIsLoading(true);
+    
+    // Add user message
+    const userMessage: Message = {
+      id: uuidv4(),
+      content: inputText,
+      isUser: true,
+      timestamp: new Date()
+    };
+    
+    setMessages(prevMessages => [...prevMessages, userMessage]);
+    setInputText(''); // Clear input after sending
     
     try {
       if (isImageGeneration) {
+        // Add placeholder AI message
+        const placeholderMessage: Message = {
+          id: uuidv4(),
+          content: "Generating image...",
+          isUser: false,
+          timestamp: new Date()
+        };
+        setMessages(prevMessages => [...prevMessages, placeholderMessage]);
+        
         const imageUrl = await generateImage(selectedModel, inputText, selectedImageStyle);
-        setGeneratedImageUrl(imageUrl);
-        setResponseText('Image generated successfully!');
+        
+        // Update messages with AI response containing image
+        setMessages(prevMessages => {
+          const updatedMessages = [...prevMessages];
+          const lastIndex = updatedMessages.length - 1;
+          
+          // Replace the placeholder with actual response
+          updatedMessages[lastIndex] = {
+            ...updatedMessages[lastIndex],
+            content: "Image generated successfully!",
+            imageUrl: imageUrl,
+            timestamp: new Date()
+          };
+          
+          return updatedMessages;
+        });
       } else {
+        // Add placeholder AI message
+        const placeholderMessage: Message = {
+          id: uuidv4(),
+          content: "Thinking...",
+          isUser: false,
+          timestamp: new Date()
+        };
+        setMessages(prevMessages => [...prevMessages, placeholderMessage]);
+        
         const fullResponse = await fetchFullResponse(inputText, selectedModel, 150);
-        setResponseText(fullResponse || 'No response');
+        
+        // Update messages with AI response
+        setMessages(prevMessages => {
+          const updatedMessages = [...prevMessages];
+          const lastIndex = updatedMessages.length - 1;
+          
+          // Replace the placeholder with actual response
+          updatedMessages[lastIndex] = {
+            ...updatedMessages[lastIndex],
+            content: fullResponse || 'No response',
+            timestamp: new Date()
+          };
+          
+          return updatedMessages;
+        });
       }
     } catch (apiError: any) {
       console.error("Venice API Error:", apiError);
       setError(`Venice API Error: ${apiError.message || 'Unknown error'}`);
-      setResponseText('');
+      
+      // Remove the placeholder message if there was an error
+      setMessages(prevMessages => {
+        return prevMessages.filter(msg => msg.isUser || msg.content !== "Thinking..." && msg.content !== "Generating image...");
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <GenerationTypeToggle 
-        isImageGeneration={isImageGeneration} 
-        onChange={handleGenerationTypeChange} 
-      />
-      
-      {isImageGeneration && (
-        <ImageStyleSelector 
-          imageStyles={imageStyles} 
-          selectedStyle={selectedImageStyle} 
-          onStyleChange={handleImageStyleChange} 
+    <Box
+      minHeight="100vh"
+      bg="gray.900"
+      color="white"
+      p={4}
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+    >
+      <Flex width="100%" maxWidth="600px" mb={4} justifyContent="space-between">
+        <GenerationTypeToggle 
+          isImageGeneration={isImageGeneration} 
+          onChange={handleGenerationTypeChange} 
         />
-      )}
+        
+        <ModelSelector 
+          models={models} 
+          selectedModel={selectedModel} 
+          onModelChange={handleModelChange} 
+        />
+        
+        {isImageGeneration && (
+          <ImageStyleSelector 
+            imageStyles={imageStyles} 
+            selectedStyle={selectedImageStyle} 
+            onStyleChange={handleImageStyleChange} 
+          />
+        )}
+      </Flex>
       
-      <ModelSelector 
-        models={models} 
-        selectedModel={selectedModel} 
-        onModelChange={handleModelChange} 
+      <ResponseDisplay 
+        messages={messages}
+        error={error}
       />
+      
+      <Box height="80px" /> {/* Spacer for fixed input */}
       
       <TextInput 
         inputText={inputText} 
         onInputChange={handleInputChange} 
         onSubmit={handleVeniceAIRequest}
         placeholder={isImageGeneration ? "Describe the image to generate" : "Enter your prompt"}
+        isLoading={isLoading}
       />
-      
-      <ResponseDisplay 
-        responseText={responseText}
-        imageUrl={generatedImageUrl}
-        isImageMode={isImageGeneration}
-        error={error}
-      />
-    </>
+    </Box>
   );
 }
 
