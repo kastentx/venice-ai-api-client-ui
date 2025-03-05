@@ -17,7 +17,7 @@
 - [ ] improve the image generation UI, maybe add images into a gallery on the side per conversation, etc
 
 **Styling/Theming**
-- [x] integrate chakra UI
+- [x] integrate chakra UI (in progress)
 - [x] convert chat window into more of a back and forth, text message style UI
 - [ ] add special formatting for 'think' modes in deepseek models, other reasoning output
 - [ ] determine if there are any code output options available

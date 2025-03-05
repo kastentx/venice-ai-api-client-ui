@@ -1,3 +1,12 @@
+
+export interface IMessage {
+  id: string;
+  content: string;
+  isUser: boolean;
+  timestamp: Date;
+  imageUrl?: string | null;
+}
+
 export interface IModel {
   id: string;
   type: string;

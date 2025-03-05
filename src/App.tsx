@@ -8,24 +8,16 @@ import ChatDisplay from './components/ChatDisplay';
 import Header from './components/Header';
 import { fetchFullResponse, generateImage } from './services/api';
 import { Box } from '@chakra-ui/react';
+import { IMessage } from './types';
 
-// Define the Message interface
-interface Message {
-  id: string;
-  content: string;
-  isUser: boolean;
-  timestamp: Date;
-  imageUrl?: string | null;
-}
 
 function App() {
   const [error, setError] = useState<string | null>(null);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isImageGeneration, setIsImageGeneration] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<IMessage[]>([]);
   
-  // Use our custom hooks
   const { 
     models, 
     selectedModel, 
@@ -39,8 +31,8 @@ function App() {
     setSelectedImageStyle 
   } = useImageStyles();
 
-  const handleModelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedModel(event.target.value);
+  const handleModelChange = (modelId: string) => {
+    setSelectedModel(modelId);
   };  
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +51,6 @@ function App() {
   };
 
   const handleVeniceAIRequest = async () => {
-    // Existing code...
     if (!selectedModel) {
       setError('Please select a model.');
       return;
@@ -74,7 +65,7 @@ function App() {
     setIsLoading(true);
     
     // Add user message
-    const userMessage: Message = {
+    const userMessage: IMessage = {
       id: uuidv4(),
       content: inputText,
       isUser: true,
@@ -88,7 +79,7 @@ function App() {
       // Existing code for image generation and text generation...
       if (isImageGeneration) {
         // Add placeholder AI message
-        const placeholderMessage: Message = {
+        const placeholderMessage: IMessage = {
           id: uuidv4(),
           content: "Generating image...",
           isUser: false,
@@ -115,7 +106,7 @@ function App() {
         });
       } else {
         // Add placeholder AI message
-        const placeholderMessage: Message = {
+        const placeholderMessage: IMessage = {
           id: uuidv4(),
           content: "Thinking...",
           isUser: false,

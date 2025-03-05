@@ -16,7 +16,7 @@ interface HeaderProps {
   imageStyles?: string[];
   selectedImageStyle?: string;
   onGenerationTypeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onModelChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  onModelChange: (modelId: string) => void;
   onStyleChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
@@ -52,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({
           fontWeight="bold"
           color="blue.300"
         >
-          MyVCU AI Chatbot
+          MyVCU AI Agent
         </Text>
 
         <Flex alignItems="center" flexWrap="wrap" justifyContent="flex-end">
