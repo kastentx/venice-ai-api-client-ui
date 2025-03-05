@@ -1,11 +1,14 @@
 import './App.css';
 import { ConversationProvider } from './context/ConversationContext';
 import ChatContainer from './components/ChatContainer';
+import Layout from './components/Layout';
 
 function App() {
   return (
     <ConversationProvider>
-      <ChatContainer />
+      <Layout>
+        <ChatContainer />
+      </Layout>
     </ConversationProvider>
   );
 }
