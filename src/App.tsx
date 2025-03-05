@@ -39,8 +39,8 @@ function App() {
     setInputText(event.target.value);
   };
 
-  const handleImageStyleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedImageStyle(event.target.value);
+  const handleImageStyleChange = (imageStyle: string) => {
+    setSelectedImageStyle(imageStyle);
   };  
 
   const handleGenerationTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,6 +48,7 @@ function App() {
     loadModels(newIsImageMode ? 'image' : 'text');
     setIsImageGeneration(newIsImageMode);
     setInputText('');
+    setSelectedImageStyle('');
   };
 
   const handleVeniceAIRequest = async () => {
@@ -76,7 +77,6 @@ function App() {
     setInputText(''); // Clear input after sending
     
     try {
-      // Existing code for image generation and text generation...
       if (isImageGeneration) {
         // Add placeholder AI message
         const placeholderMessage: IMessage = {

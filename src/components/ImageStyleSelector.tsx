@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import {
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectRoot,
+  SelectTrigger,
+  SelectValueText,
+} from "@/components/ui/select";
+import { createListCollection, SelectValueChangeDetails } from '@chakra-ui/react';
 
 interface ImageStyleSelectorProps {
   imageStyles: string[];
   selectedStyle: string;
-  onStyleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  onStyleChange: (imageStyle: string) => void;
 }
 
 const ImageStyleSelector: React.FC<ImageStyleSelectorProps> = ({ 
@@ -11,16 +20,44 @@ const ImageStyleSelector: React.FC<ImageStyleSelectorProps> = ({
   selectedStyle, 
   onStyleChange 
 }) => {
+  const allStyles = ['None', ...imageStyles];
+
+  useEffect(() => {
+    if (!selectedStyle && allStyles.length > 0) {
+      onStyleChange(allStyles[0]);
+    }
+  }, [allStyles, selectedStyle, onStyleChange]);
+
   return (
     <div className="image-style-selector">
-      <select value={selectedStyle} onChange={onStyleChange}>
-        <option value="">Select Image Style</option>
-        {imageStyles.map((style) => (
-          <option key={style} value={style}>
-            {style}
-          </option>
-        ))}
-      </select>
+      <SelectRoot 
+        value={[selectedStyle]} 
+        onValueChange={(details: SelectValueChangeDetails) => onStyleChange(details.value[0])}
+        collection={createListCollection({
+          items: allStyles.map((style) => ({
+            label: style,
+            value: style,
+          })),
+        })}
+      >
+        <SelectLabel>Selected Image Style:</SelectLabel>
+        <SelectTrigger>
+          <SelectValueText placeholder="Select Image Style..."/>
+        </SelectTrigger>
+        <SelectContent>
+          {allStyles.map((style) => (
+            <SelectItem
+              key={style}
+              item={{
+                label: style,
+                value: style,
+              }}
+            >
+              {style}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </SelectRoot>
     </div>
   );
 };

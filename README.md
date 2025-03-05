@@ -10,6 +10,7 @@
 
 **Layout**
 - [ ] clean up UI switch between image/text generation mode
+- [ ] add drawer/sidebars
 
 **Image Generation**
 - [ ] check image style 'none' error

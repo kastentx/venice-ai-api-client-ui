@@ -17,13 +17,7 @@ interface ModelSelectorProps {
 }
 
 const ModelSelector: React.FC<ModelSelectorProps> = ({ models, selectedModel, onModelChange }) => {
-  const availableModels = createListCollection({
-    items: models.map((model) => ({
-      label: model.id,
-      value: model.id,
-    })),
-  });
-  
+ 
   // Set a default model on page load or when models change
   const prevModelsRef = React.useRef<IModel[]>([]);
   useEffect(() => {
@@ -40,7 +34,12 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ models, selectedModel, on
       <SelectRoot 
         value={[selectedModel]} 
         onValueChange={(details: SelectValueChangeDetails) => onModelChange(details.value[0])}
-        collection={availableModels}
+        collection={createListCollection({
+          items: models.map((model) => ({
+            label: model.id,
+            value: model.id,
+          })),
+        })}
       >
         <SelectLabel>Selected Model:</SelectLabel>
         <SelectTrigger style={{ minWidth: '300px' }}>

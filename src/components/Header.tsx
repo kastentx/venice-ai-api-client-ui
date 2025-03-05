@@ -17,7 +17,7 @@ interface HeaderProps {
   selectedImageStyle?: string;
   onGenerationTypeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onModelChange: (modelId: string) => void;
-  onStyleChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  onStyleChange?: (imageStyle: string) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
