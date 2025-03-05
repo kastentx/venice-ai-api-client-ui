@@ -59,7 +59,7 @@ export const ConversationProvider: React.FC<{ children: ReactNode }> = ({ childr
           const lastIndex = updatedMessages.length - 1;
           updatedMessages[lastIndex] = {
             ...updatedMessages[lastIndex],
-            content: "Image generated successfully!",
+            content: "",
             imageUrl: imageUrl,
             timestamp: new Date()
           };

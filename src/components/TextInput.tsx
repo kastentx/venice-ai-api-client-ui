@@ -48,10 +48,10 @@ const TextInput: React.FC<TextInputProps> = ({
           mr={2}
         />
         <Button 
-          colorScheme="blue"
           onClick={onSubmit}
           disabled={!inputText.trim()}
           loading={isLoading}
+          variant="surface"
         >
           Send
         </Button>
