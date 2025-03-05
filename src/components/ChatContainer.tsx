@@ -71,7 +71,6 @@ const ChatContainer: React.FC = () => {
       display="flex"
       flexDirection="column"
       alignItems="center"
-      position="relative"
       overflow="hidden"
     >
       <Header
@@ -90,8 +89,11 @@ const ChatContainer: React.FC = () => {
         width="100%"
         display="flex"
         justifyContent="center"
-        overflow="hidden"
         position="relative"
+        overflow="hidden"
+        mb="40px" // Increased margin bottom to prevent textInput overlap
+        mt="80px" // Increased margin top to prevent header overlap
+        pt="5px" // Increased padding top to prevent header overlap
       >
         <ChatDisplay 
           messages={messages}
