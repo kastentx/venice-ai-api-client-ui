@@ -9,11 +9,11 @@
 - [ ] expose model features like web_search, etc.
 
 **Layout**
-- [ ] clean up UI switch between image/text generation mode
+- [x] clean up UI switch between image/text generation mode
 - [ ] add drawer/sidebars
 
 **Image Generation**
-- [ ] check image style 'none' error
+- [x] check image style 'none' error
 - [ ] add extended options for image gen, etc. to match API spec
 - [ ] improve the image generation UI, maybe add images into a gallery on the side per conversation, etc
 

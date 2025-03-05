@@ -53,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({
           fontWeight="bold"
           color="blue.300"
         >
-          MyVCU AI Agent
+          MyVCU - Private AI Agent
         </Text>
 
         <Flex alignItems="center" flexWrap="wrap" justifyContent="flex-end">
