@@ -1,9 +1,11 @@
 import OpenAI from "openai";
-import { ICompletionResponse, IModel } from "../types";
+import { IModel } from "../types";
 import { ChatCompletionMessageParam } from "openai/src/resources/index.js";
 
 const BASE_URL = import.meta.env.VITE_VENICE_BASE_URL;
 const API_KEY = import.meta.env.VITE_VENICE_API_KEY;
+
+const DEFAULT_IMAGE_STYLE = 'Default';
 
 export const veniceClient = new OpenAI({
   baseURL: BASE_URL,
@@ -42,7 +44,7 @@ export async function fetchImageStyles(): Promise<string[]> {
   
   const data = await response.json();
   if (Array.isArray(data.data)) {
-    return data.data as string[];
+    return [DEFAULT_IMAGE_STYLE, ...data.data as string[]];
   }
   
   throw new Error('Invalid image styles format from API');
@@ -103,7 +105,7 @@ export async function generateImage(
       model,
       prompt,
       hide_watermark: true,
-      style_preset: stylePreset || undefined
+      style_preset: stylePreset && stylePreset !== DEFAULT_IMAGE_STYLE ? stylePreset : undefined,
     })
   };
 
