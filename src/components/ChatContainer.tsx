@@ -64,14 +64,15 @@ const ChatContainer: React.FC = () => {
 
   return (
     <Box
-      minHeight="100vh"
+      height="100vh"
       minWidth="600px"
       bg="gray.900"
       color="white"
       display="flex"
       flexDirection="column"
       alignItems="center"
-      pt="70px"
+      position="relative"
+      overflow="hidden"
     >
       <Header
         isImageGeneration={isImageGeneration}
@@ -84,12 +85,19 @@ const ChatContainer: React.FC = () => {
         onStyleChange={handleImageStyleChange}
       />
       
-      <ChatDisplay 
-        messages={messages}
-        error={error}
-      />
-      
-      <Box height="80px" /> {/* Spacer for fixed input */}
+      <Box 
+        flex="1"
+        width="100%"
+        display="flex"
+        justifyContent="center"
+        overflow="hidden"
+        position="relative"
+      >
+        <ChatDisplay 
+          messages={messages}
+          error={error}
+        />
+      </Box>
       
       <TextInput 
         inputText={inputText} 

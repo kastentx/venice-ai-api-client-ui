@@ -34,10 +34,10 @@ const ChatDisplay: React.FC<ChatDisplayProps> = ({
     <Box 
       width="100%" 
       maxWidth="600px"
-      height="calc(100vh - 180px)" // Adjust based on your input height
-      mb={2}
+      height="100%"
       overflowY="auto"
       p={2}
+      pb="100px" // Add padding at bottom to prevent content being hidden behind TextInput
     >
       {error && (
         <Box 

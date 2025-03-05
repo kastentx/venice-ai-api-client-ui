@@ -13,20 +13,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const rightDrawer = useDisclosure();
   
   return (
-    <Box position="relative" minHeight="100vh">
+    <Box height="100vh" overflow="hidden">
       {/* Left Drawer */}
       <LeftDrawer 
         isOpen={leftDrawer.open} 
-        onOpenChange={(openState) => leftDrawer.setOpen(openState)}
+        onOpenChange={leftDrawer.onClose}
       />
 
       {/* Right Drawer */}
       <RightDrawer 
         isOpen={rightDrawer.open} 
-        onOpenChange={(openState) => rightDrawer.setOpen(openState)}
+        onOpenChange={rightDrawer.onClose}
       />
 
-      <Box>
+      <Box height="100vh">
         {/* Drawer Toggle Buttons - Fixed position buttons */}
         <Box 
           position="fixed" 
