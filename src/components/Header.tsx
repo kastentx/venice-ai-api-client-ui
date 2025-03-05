@@ -3,6 +3,7 @@ import {
   Box,
   Flex,
   Text,
+  SwitchCheckedChangeDetails,
 } from '@chakra-ui/react';
 import { IModel } from '../types';
 import ModelSelector from './ModelSelector';
@@ -15,7 +16,7 @@ interface HeaderProps {
   selectedModel: string;
   imageStyles?: string[];
   selectedImageStyle?: string;
-  onGenerationTypeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onModeChange: (event: SwitchCheckedChangeDetails) => void;
   onModelChange: (modelId: string) => void;
   onStyleChange?: (imageStyle: string) => void;
 }
@@ -26,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({
   selectedModel,
   imageStyles = [],
   selectedImageStyle = '',
-  onGenerationTypeChange,
+  onModeChange,
   onModelChange,
   onStyleChange
 }) => {
@@ -36,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({
       top="0"
       left="0"
       right="0"
-      bg="gray.800"
+      bg="gray.600"
       boxShadow="md"
       zIndex="10"
       p={3}
@@ -59,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({
           <Box mr={4}>
             <GenerationTypeToggle
               isImageGeneration={isImageGeneration}
-              onChange={onGenerationTypeChange}
+              onModeChange={onModeChange}
             />
           </Box>
           

@@ -7,7 +7,7 @@ import TextInput from './components/TextInput';
 import ChatDisplay from './components/ChatDisplay';
 import Header from './components/Header';
 import { fetchFullResponse, generateImage } from './services/api';
-import { Box } from '@chakra-ui/react';
+import { Box, SwitchCheckedChangeDetails } from '@chakra-ui/react';
 import { IMessage } from './types';
 
 
@@ -43,8 +43,8 @@ function App() {
     setSelectedImageStyle(imageStyle);
   };  
 
-  const handleGenerationTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newIsImageMode = event.target.checked;
+  const handleModeChange = (event: SwitchCheckedChangeDetails) => {
+    const newIsImageMode = event.checked;
     loadModels(newIsImageMode ? 'image' : 'text');
     setIsImageGeneration(newIsImageMode);
     setInputText('');
@@ -161,7 +161,7 @@ function App() {
         selectedModel={selectedModel}
         imageStyles={imageStyles}
         selectedImageStyle={selectedImageStyle}
-        onGenerationTypeChange={handleGenerationTypeChange}
+        onModeChange={handleModeChange}
         onModelChange={handleModelChange}
         onStyleChange={handleImageStyleChange}
       />
