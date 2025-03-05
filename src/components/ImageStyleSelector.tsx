@@ -29,7 +29,7 @@ const ImageStyleSelector: React.FC<ImageStyleSelectorProps> = ({
   }, [allStyles, selectedStyle, onStyleChange]);
 
   return (
-    <div className="image-style-selector">
+    <div className="image-style-selector" style={{ minWidth: '250px' }}>
       <SelectRoot 
         value={[selectedStyle]} 
         onValueChange={(details: SelectValueChangeDetails) => onStyleChange(details.value[0])}
@@ -41,10 +41,10 @@ const ImageStyleSelector: React.FC<ImageStyleSelectorProps> = ({
         })}
       >
         <SelectLabel>Selected Image Style:</SelectLabel>
-        <SelectTrigger>
+        <SelectTrigger style={{ minWidth: '250px' }}>
           <SelectValueText placeholder="Select Image Style..."/>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent style={{ minWidth: '250px' }}>
           {allStyles.map((style) => (
             <SelectItem
               key={style}
